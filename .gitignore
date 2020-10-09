@@ -30,3 +30,19 @@
 *.exe
 *.out
 *.app
+
+#VSCode folders
+.vscode/
+
+#tests executables
+*.test
+
+#local folder
+local/
+
+#build manual files
+manual/manual.aux
+manual/manual.log
+manual/manual.synctex.gz
+manual/manual.toc
+

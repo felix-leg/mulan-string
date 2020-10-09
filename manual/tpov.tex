@@ -1,0 +1,205 @@
+\section{The translators' POV}\label{transPOV}
+
+As a translator the only thing you must to learn is the \mulan{}'s template syntax. 
+The syntax is based on a system of tags inserted inside template string. They are recognized by being surrounded by delimiters.
+These delimiters are, by default, \verb+%{+ and \verb+}%+. So, for example the below sentence:
+\begin{quote}
+	You have selected \verb+%{num}%+ \verb+%{num!P:object,objects}%+ for deletion.
+\end{quote}
+contains two tags: \verb+%{num}%+ and \verb+%{num!P:object,objects}%+. 
+The first tag is called \emph{the substitution tag} and the second: \emph{the function tag}.
+Everything that is surrounded by these delimiters is subject to \mulan{} "magic."
+
+\paragraph{Warning!} The programmer has the ability to change those delimiters to anything else! Make sure you consult the programmers' team in case you would suspect they have done it.
+
+\subsection{Types of tags}
+OK, so what types of tags content you may encounter/use?
+Well, at first let me tell you about general types of tags:
+\subsubsection{Substitution tags}
+That type is the simplest of all and also the most restricted in how it may behave. 
+They are recognized by one word put between delimiters:
+\begin{quote}
+	\verb+%{+\textit{variable}\verb+}%+
+\end{quote}
+All that it does is put the \textit{variable} content (given by a programmer) in its place.
+You, as the translator, must make sure that content will be put in the right place. You do it by moving such a tag into a place where it is the most logical for a sentence in your language.
+
+So, if given a template:\begin{quote}
+	There were \verb+%{num}%+ changes in the \verb+%{document_type}%+
+\end{quote}
+If your language for some reason requires that \textit{document\_type} should be to put before \textit{num}, you can switch those two tags like that:\begin{quote}
+	In \verb+%{document_type}%+ there is \verb+%{num}%+ changes.
+\end{quote}
+ The order of them doesn't matter as long as all of them are in place.
+
+\subsubsection{Function tags}
+Ah, there is where \mulan{} gets its power! That tag type returns the result of call to one of predefined functions.
+These functions works by getting the variable name (or not) and some parameters and, based on that information, produces an output. 
+
+A function can take one parameter, a table, or a hash (also called a map). Also some functions needs a variable name to work, others doesn't need it.
+If that sounds complicated, don't worry: I explain all of it in parts.
+
+The first thing is whenever the function needs a variable or not:\begin{description}
+	\item[Requred:] functions of this type are written in this form: \begin{quote}
+		\verb+%{+\textit{variable\_name}\verb+!FUNCTION_NAME+\textit{argument(s)}\verb+}%+
+	\end{quote} (mind the \texttt{!} character that separates the variable name from function name)
+	\item[Not needed:] this type of functions are written in this form:\begin{quote}
+		\verb+%{+\textbf{+}\verb+FUNCTION_NAME+\textit{argument(s)}\verb+}%+
+	\end{quote} (remember about the plus sign at the beginning of the function name)
+\end{description}
+
+The second thing is how a function gets its arguments. An argument list goes right after the function name, and can take one of these forms:
+\begin{center}
+	\begin{tabular}{|l|l|l|} \hline 
+		\bf Form & \bf Description & \bf Example \\ \hline 
+		\verb+=+\textit{value} & gives \emph{one} parameter & \verb+%{item!C=gen}%+ \\ \hline 
+		\verb+:+\textit{first}\verb+,+\textit{second}\verb+,+\ldots & gives \emph{a table} & \verb+%{num!P:mouse,mice}%+ \\ \hline 
+		\verb*+ par1=+\textit{value1}\verb*+ par2=+\textit{value2}\ldots & gives \emph{a map} & \verb+%{person!G m={his} f={hers}}%+ \\ \hline 
+	\end{tabular}
+\end{center}
+
+I hope all of it will be clear once you read the subsection \hyperref[funcs]{about functions}.
+
+\subsubsection{Comment tags}
+
+And the last are tags which serve as an aid for translators given by programmers. Sometimes you may find such that tag:
+\begin{quote}
+	\verb+%{#+\textit{a commentary}\verb+#}%+
+\end{quote}
+In a translation you can do anything to that tag, even remove it completely. 
+
+What is their purpose? Well, sometimes you may find a template which is hard to translate without some external information. For example a text: \begin{quote}
+	A kid just ran away.
+\end{quote} may be hard or even impossible to translate, if in your language "ran away" requires the knowledge about the kid's sex. You then may ask a programmer to clarify it by putting a comment like this:
+\begin{quote}
+	A \verb+%{#male#}%+kid just ran away.
+\end{quote}
+
+Another reason is some backends like GNU Gettext may remove duplicate templates which, for some cases, can make a problem for a translator. Let's imagine we got this template:
+\begin{quote}
+	Open
+\end{quote}
+and an information that it is used in both "File" and "Print" menus. For some languages the translation of "Open" may differ depending on if it relates to a file or a printer.
+Unfortunately, your backend may treat the second "Open" as redundant, leaving you with a problem how to write a translation which fits both cases.
+
+The solution again lies in the possibility for programmer to add comments. For example:
+\begin{quote}
+	\verb+%{#File menu#}%+Open\\
+	\verb+%{#Print menu#}%+Open
+\end{quote} will not be reduced to one item and gives a translator a way to translate them differently. 
+
+\subsection{List of functions}\label{funcs}
+
+OK, so after we learned how to write function tags, now I can tell you what possibilities \mulan{} gives to you.
+I divided the list into 3 parts by the topic. Each topic tells about problems you may encounter during a translation.
+
+\def\funSep{\vspace{1em} \hrule \vspace{1em}}
+
+\subsubsection{Gender}
+Gender tells about a class a word belongs to. it is a peculiarity of each noun and a language, which have got this feature, may require other words to adapt to the other word. 
+
+\mulan{} gives two functions to work with genders:\par \funSep
+
+{\large (S)et (G)ender $\Rightarrow$ \verb-%{+SG=-\textit{gender\_to\_set}\verb+}%+ }\vspace{1em}
+
+Each template has got a gender assigned to them. Normally it is an empty string, but using the \textsc{SG} function we can change that.
+
+This function produces nothing in place where it was put, so alone it is not useful. But becomes one when used with the next function.
+
+\funSep {\large (G)ender writer $\Rightarrow$ \verb-%{noun!G:-\textit{a list}\verb-}%- \textbf{or} \verb-%{noun!G -\textit{a map}\verb-}%- }\vspace{1em}
+
+Produces output based of gender set to the \textit{noun}. To work right the value of \textit{noun} variable must be another template where \textsc{SG} function was used.
+\paragraph{Example:} Let's say we have a template (written in Latin):
+\begin{quote}
+	\verb+%{noun}%+ magn\verb+%{noun!G m={us} f={a} n={um}}%+ est
+\end{quote}
+and three other templates:
+\begin{quote}
+	\verb-%{+SG=m}%-Puteus\\
+	\verb-%{+SG=f}%-Officina\\
+	\verb-%{+SG=n}%-Forum
+\end{quote}
+If now a program sets \textit{noun} variable to one of those three templates, the results will be:
+\begin{quote}
+	\texttt{Puteus magnus est} (for \textit{noun} set to the first template)\\
+	\texttt{Officina magna est} (for the second template)\\
+	\texttt{Forum magnum est} (and for the third template)
+\end{quote}
+
+\paragraph{Short and long version} In the example above the \textsc{G} function was written in the long (verbose) form. 
+When executed it tries to match each of the given parameters names (\texttt{m}, \texttt{f} and \texttt{n}) to those set by the \textsc{SG} function in the sub-template. 
+Sometimes however you don't want to write it \emph{that} long and want some shorter and quicker form to write. As you can see in the function header in this manual, 
+the \textsc{G} function has a shorter form: \verb-%{noun!G:-\textit{a list}\verb-}%-. To use it in our Latin example we need to replace it with:
+\begin{quote}
+	\verb+%{noun}%+ magn\verb+%{noun!G:us,a,um}%+ est
+\end{quote}
+Now the \textit{-us}, \textit{-a} and \textit{-um} endings are assigned to the \texttt{m=}, \texttt{f=} and \texttt{n=} parameters in order.
+The order of that parameters depends on the language. The \mulan{} has an embedded list of languages it supports. Each of entry in that list contains, among others, 
+a specific order set to the Gender writer function, which dictates how a list is converted into a map. You can read what is that order in the \hyperref[supLangs]{Supported languages section}.
+
+\subsubsection{Case}
+
+Some languages employ a case system. A form of a noun depends of what a function it has in a sentence. If for example a noun is used as sentence's subject it has different form than
+when used as an object.
+
+For this feature \mulan{} has got two functions:\par 
+
+\funSep {\large (C)ase chooser $\Rightarrow$ \verb-%{noun!C=-\textit{required\_case\_name}\verb+}%+ }\vspace{1em}
+
+Outputs the \textit{noun} variable, first informing it it should inflect by \textit{required\_case\_name}. 
+
+\funSep {\large (C)ase writer $\Rightarrow$ \verb-%{+C case1={-\textit{case1\_output}\verb+} case2={+\textit{case2\_output}\verb+}}%+ \textbf{or}\\
+\verb-%{+C:-\textit{list of outputs}\verb+}%+
+ }\vspace{1em}
+
+If a template containing this function was informed by the Case chooser to inflect, this function outputs a \texttt{case$n$\_output} associated with \texttt{case$n$}.
+
+\paragraph{Example:} Again a Latin example. There is a template for word \emph{domus} (house):
+\begin{quote}
+	dom\verb-%{+C nom={us} gen={us} dat={ui} acc={um} abl={o} voc={us} loc={i}}%-
+\end{quote}
+and a template:
+\begin{quote}
+	De \verb+%{from!C=abl}%+ in \verb+%{to!C=acc}%+
+\end{quote} which means "From \textit{from} to \textit{to}".
+
+If now the program assigns both variables to the same "domus" template, the output will be:
+\begin{quote}
+	De \textbf{domo} in \textbf{domum}
+\end{quote} correctly inflected.
+
+\paragraph{Short and long version} just like in the Gender section, the Case writer also has got a~long and a~short form.
+The short form of the "domus" template may be like:
+\begin{quote}
+	dom\verb-%{+C:us,us,ui,um,o,us,i}%-
+\end{quote}
+
+And just like for Gender functions, the order of assigning elements of that list to a map is given in the \hyperref[supLangs]{Supported languages section}.
+
+\subsubsection{Plural forms}
+Pluralization rules tells how a noun should change its form based of some numerical quantity. Languages vary \emph{a lot} in this matter. 
+
+There is only one function for this feature in \mulan{}.
+
+\funSep {\large (P)luralizer $\Rightarrow$ \verb-%{num!P one={-\textit{output\_for\_1}\verb+} other={+\textit{output\_for\_the\_rest}\verb+}}%+ \textbf{or}\\
+\verb-%{num!P:-\textit{list of outputs}\verb+}%+
+ }\vspace{1em}
+ 
+The function gets a number from the variable and gives an output depending of the value and pluralization rules in the template's language.
+
+The \hyperref[supLangs]{Supported languages section} contains the rules, list of classes of numbers and how short form of the function is mapped to the long form.
+
+\paragraph{Example:} In the English language nouns has got singular and plural forms. Singular forms are applied to quantities equal $1$ and plural forms for the rest.
+Therefore one can write a template like:
+\begin{quote}
+	\verb+%{num}%+ file\verb+%{num!P one={} other={s}}%+ deleted
+\end{quote}
+Now if a program sets \textit{num} variable to $1$ the output will be:
+\begin{quote}
+	1 file deleted
+\end{quote}
+and with $num=3$ it will be:
+\begin{quote}
+	3 files deleted
+\end{quote}
+

@@ -1,0 +1,32 @@
+# Polish translations for example package.
+# Copyright (C) 2020 THE example'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the example package.
+# Przemysław Chojnacki <felix.leg@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: example 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-08 14:24+0200\n"
+"PO-Revision-Date: 2020-10-08 14:25+0200\n"
+"Last-Translator: Przemysław Chojnacki <felix.leg@gmail.com>\n"
+"Language-Team: Polish\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#. now we can use translations
+#: main.cpp:21
+msgid "Simple text"
+msgstr "Prosty tekst"
+
+#: main.cpp:24
+msgid "%{var}% text"
+msgstr "Tekst %{var}%"
+
+#: main.cpp:27
+msgid "%{num}% file%{num!P:,s}% modifed"
+msgstr "%{num}% plik%{num!P:,i,ów}% został%{num!P:,y,o}% zmodifikowan%{num!P:y,ne,ych}%"
