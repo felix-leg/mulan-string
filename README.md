@@ -1,6 +1,8 @@
-# MUltiLANguage String
+#  *Mu*lti *Lan*guage *String*
 An i18n and l10n library for C++. It aims at being easy to use for both programmer and translator, yet
 still powerful. 
+
+[The latest release: 1.0]{https://github.com/felix-leg/mulan-string/releases/download/1.0/mulan-string-1.0.tar.gz)
 
 ## How MuLan-String works
 The idea of MLS is based on *template strings*. From the programmer's point of view the usage comes down to:
