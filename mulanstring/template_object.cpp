@@ -5,8 +5,8 @@
 #	define BOOST_TEST_MODULE basic_parse_module
 #	include <boost/test/unit_test.hpp>
 
-#endif
 #	include <iostream>
+#endif
 
 /**
  * This module contains the Template class responsible for parsing template
