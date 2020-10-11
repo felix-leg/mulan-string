@@ -10,7 +10,7 @@ Both parts are made with customization in mind. To use the library one have to "
 \end{description}
 
 \subsection{The \texttt{mulanstr.hpp} file}\label{headerFile}
-In this file we decide which of backends we want to use\footnote{for now (version $1.0$) \mulan{} offers only GNU Gettext backend}:
+In this file we decide which of the supported backends we want to use\footnote{for now (version $1.0$) \mulan{} offers only GNU Gettext backend}:
 \begin{verbatim}
 //to use GNU Gettext backend
 #define MULANSTR_USE_GETTEXT
@@ -27,7 +27,7 @@ These functions (and their replacements) are:
 \begin{enumerate}
 	\item \texttt{\_(message)} or \texttt{mls::translate(message)}: the basic template retriever. Gets template in the default language set during initialization.
 	\item \texttt{\_c(catalog, message)} or \texttt{mls::translate(catalog, message)}: Gets template from a different catalog. 
-	The term `catalog' can mean different things for different backends. In the GNU Gettext it is the name of `\texttt{.mo}` file.
+	The term `catalog' can mean different things for different backends. In the GNU Gettext it is the name of a `\texttt{.mo}` file.
 	\item \texttt{\_l(message, locale)} or \texttt{mls::translateWithLocale(message, locale)}: Gets template in the language given as the second parameter. 
 	\item \texttt{\_cl(catalog, message, locale)} or\\ \texttt{mls::translateWithLocale(}\texttt{catalog, message, locale)}: like 2. but allows to choose a different language.
 \end{enumerate}
@@ -64,11 +64,11 @@ If for some reason we want to use \verb+[[+ and \verb+]]+ as delimiters, we have
 #define MULANSTR_TAG_END "]]"
 \end{verbatim} in our \texttt{mulanstr.cpp} file.
 
-Some template inserts needs parameters. For example in:
+Some template tags needs parameters. For example in:
 \begin{quotation}
 	There is \verb+%{num}%+ file\verb+%{num!P one=+\textbf{\{\}}\verb+ other=+\textbf{\{s\}}\verb+}%+
 \end{quotation}
-template the \textsc{P} function returns text based of the quantity given in \texttt{num} variable. 
+template the \textsc{P} function returns text based of the quantity given in the \texttt{num} variable. 
 It then produces output based on whenever \texttt{num} is $1$ or $>$1 (for English language).
 So, the above example will result in "There is 1 file" or "There is 8 files" (for \texttt{num} being $1$ and $8$ respectively).
 For this it needs to know what text to output. And these texts are given between \textbf{\{} and \textbf{\}} delimiters.
@@ -101,7 +101,7 @@ We give that information by invoking \verb+apply(<var name>, <value>)+ method on
 \begin{verbatim}
 filesFound.apply("num",3);
 \end{verbatim}
-Some templates have got more than one variable. To set them we call \verb+apply(...)+ for each of the variables.
+Some templates have got more than one variable. To set them, we call \verb+apply(...)+ for each of the variables.
 You can do it by separate calls or chain them:
 \begin{verbatim}
 auto parentHasKids = _("%{parent}% has got %{num}% %{num!P:kid,kids}%");
@@ -129,12 +129,12 @@ std::cout << _("%{parent}% has got %{num}% %{num!P:kid,kids}%")
 \end{verbatim}
 
 \subsection{Working with backends}
-\mulan{}'s templates are taken from the backend. Different backends require different method to extract translatable strings from your project's code.
+\mulan{}'s templates are taken from a backend. Different backends require different method to extract translatable strings from your project's code.
 Another fact is some backends require an initialization process before they can retrieve strings. How to do it is explained below.
 \subsubsection{GNU Gettext}
 To initialize Gettext we need to call \verb+mls::backend::init(...)+ function. 
-This function requires a name of the main catalog used by our program. Usually it is project name set by \verb+#define PACKAGE ...+ in the \texttt{config.h} header (if we use Autoconf).
-Other parameters are: the locale name and localization of \texttt{.mo} files. These are optional and, if not provides, are set to the default values (which for the locale is the system locale 
+This function requires a name of the main catalog used by our program. Usually it is the project name set by \verb+#define PACKAGE ...+ in the \texttt{config.h} header (if we use Autoconf).
+Other parameters are: the locale name and localization of \texttt{.mo} files. These are optional and, if not provided, are set to their default values (which for the locale is the system locale 
 and for the localization is \texttt{/usr/local/share/locale}). The initialization should be done as earlier as possible, preferably in the \verb+main()+ function:
 \begin{verbatim}
 int main() {
@@ -154,7 +154,7 @@ To extract template strings we need to run \texttt{xgettext} with these paramete
 \begin{quote}
 	\texttt{xgettext} \verb+-C+ \verb+-k_+ \verb+-k_c:2+ \verb+-k_l:1+ \verb+-k_cl:2+ \texttt{-o} $<$\textbf{name of .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
 \end{quote}
-or, if we set \verb+MULANSTR_DONT_USE_UNDERSCORE+ we need to write longer list:
+or, if we have set \verb+MULANSTR_DONT_USE_UNDERSCORE+ we need to write a longer list:
 \begin{quote}
 	\texttt{xgettext} \verb+-C+ \verb+-kmls::translate+ \verb+-kmls::translate:2+ $\backslash$ \\ \verb+-kmls::translateWithLocale:1+ \verb+-kmls::translateWithLocale:2+ $\backslash$ \\ \texttt{-o} $<$\textbf{name of .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
 \end{quote}
@@ -162,7 +162,7 @@ or, if we set \verb+MULANSTR_DONT_USE_UNDERSCORE+ we need to write longer list:
 For information on how to work with \texttt{.pot}, \texttt{.po} and \texttt{.mo} files refer to the GNU Gettext manual\footnote{Available at \url{https://www.gnu.org/software/gettext/manual/index.html}}.
 
 \subsection{A quick overview of the template string syntax}
-So far now I showed how to get and work with templates, but nothing about \emph{what to put in them}. 
+So far now I told you how to get and work with templates, but nothing about \emph{what to put in them}. 
 This is the job of this subsection. However, I won't show all the possibles of the \mulan{} library.
 The reason is you as the programmer are using English in the source code and as the default language for communicating with a user. 
 So, you only need to know those elements of \mulan{}'s template system which are enough to work in English. 
@@ -170,14 +170,14 @@ If you want to know more, read the \hyperref[transPOV]{Translators' POV section}
 
 OK, so what \mulan{}'s templates are made of? 
 The templates are strings with tags which may be identified by \verb+%{+ and \verb+}%+ delimiters\footnote{Remember, you can change the delimiters}.
-Everything inside them tells the \mulan{} to do its magic. 
+Everything inside them tells the \mulan{} to do its "magic". 
 
 There are two main types of tags: a substitution tag and a function tag:
 \paragraph{The substitutions} are tags in the form \verb+%{+\textit{variable\_name}\verb+}%+. They work by putting a text (or a number) from a variable named the same as it is written between the delimiters.
-The content of that variable are given by the \verb+apply(...)+ method of the template. 
+The content of that variable are given by the \verb+apply(...)+ method of a template. 
 
 \paragraph{The functions} are tags in the form \verb+%{+\textit{variable\_name}\verb+!FUNCTION+ \textit{arguments...}\verb+}%+.
-They work in the similar way to the above, but uses one of \mulan{} functions to process the content of the \textit{variable\_name} in some way and produce the output based on the result.
+They work in the similar way to the above, but use one of \mulan{} functions to process the content of the \textit{variable\_name} in some way and produce the output based on its result.
 For the English users the only function you must know about is the \texttt{P} function, which stands for \textit{(P)luralize}.
 The function gets two parameters and a variable name. The parameters tells the function what to output if the variable is equal to $1$ or not.
 
@@ -192,7 +192,7 @@ The arguments may be given in two possible ways:
 \begin{quote}
 	\verb+%{num}%+ \verb+%{num!P:page,pages}%+ \verb+%{num!P one={has} other={have}}%+ been printed.
 \end{quote}
-Suppose we set \textit{num} to be equal $1$. The first tag in the above template will put the string "\texttt{1}" in its place.
+Suppose we have set \textit{num} to be equal $1$. The first tag in the above template will put the string "\texttt{1}" in its place.
 The second tag will check the \textit{num} and, because it is equal $1$, it will put the "\texttt{page}" string in its place.
 The third tag works the same way, but its argument list was given in a more verbose form. The tag in this case will get the string given in the \texttt{one} parameter
 and put the "\texttt{has}" string in its place.
@@ -216,7 +216,7 @@ They are made in this way:
 \begin{quote}
 	Text \verb+%{#+\textit{comment}\verb+#}%+ around.
 \end{quote}
-What \mulan{} does with them is it treats them as if they wasn't there. So, the result of above example will be:
+What \mulan{} does with them is it treats them as if they weren't there. So, the result of the above example will be:
 \begin{verbatim*}
 Text  around.
 \end{verbatim*}(mind the double spaces between words!)

@@ -1,6 +1,6 @@
 \section{The translators' POV}\label{transPOV}
 
-As a translator the only thing you must to learn is the \mulan{}'s template syntax. 
+As a translator the only thing you must learn is the \mulan{}'s template syntax. 
 The syntax is based on a system of tags inserted inside template string. They are recognized by being surrounded by delimiters.
 These delimiters are, by default, \verb+%{+ and \verb+}%+. So, for example the below sentence:
 \begin{quote}
@@ -13,15 +13,15 @@ Everything that is surrounded by these delimiters is subject to \mulan{} "magic.
 \paragraph{Warning!} The programmer has the ability to change those delimiters to anything else! Make sure you consult the programmers' team in case you would suspect they have done it.
 
 \subsection{Types of tags}
-OK, so what types of tags content you may encounter/use?
+OK, so what types of tag content you may encounter/use?
 Well, at first let me tell you about general types of tags:
 \subsubsection{Substitution tags}
-That type is the simplest of all and also the most restricted in how it may behave. 
+This type is the simplest of all and also the most restricted in how it may behave. 
 They are recognized by one word put between delimiters:
 \begin{quote}
 	\verb+%{+\textit{variable}\verb+}%+
 \end{quote}
-All that it does is put the \textit{variable} content (given by a programmer) in its place.
+All what it does is to put the \textit{variable} content (given by a programmer) in its place.
 You, as the translator, must make sure that content will be put in the right place. You do it by moving such a tag into a place where it is the most logical for a sentence in your language.
 
 So, if given a template:\begin{quote}
@@ -33,7 +33,7 @@ If your language for some reason requires that \textit{document\_type} should be
  The order of them doesn't matter as long as all of them are in place.
 
 \subsubsection{Function tags}
-Ah, there is where \mulan{} gets its power! That tag type returns the result of call to one of predefined functions.
+Ah, there is where \mulan{} gets its power! This tag type returns the result of a call to one of predefined functions.
 These functions works by getting the variable name (or not) and some parameters and, based on that information, produces an output. 
 
 A function can take one parameter, a table, or a hash (also called a map). Also some functions needs a variable name to work, others doesn't need it.
@@ -90,13 +90,13 @@ The solution again lies in the possibility for programmer to add comments. For e
 
 \subsection{List of functions}\label{funcs}
 
-OK, so after we learned how to write function tags, now I can tell you what possibilities \mulan{} gives to you.
+OK, so after we have learned how to write function tags, now I can tell you what possibilities \mulan{} gives to you.
 I divided the list into 3 parts by the topic. Each topic tells about problems you may encounter during a translation.
 
 \def\funSep{\vspace{1em} \hrule \vspace{1em}}
 
 \subsubsection{Gender}
-Gender tells about a class a word belongs to. it is a peculiarity of each noun and a language, which have got this feature, may require other words to adapt to the other word. 
+Gender tells about a class a word belongs to. It is a peculiarity of each noun and a language, which have got this feature, may require other words to adapt to that other word. 
 
 \mulan{} gives two functions to work with genders:\par \funSep
 
@@ -119,7 +119,7 @@ and three other templates:
 	\verb-%{+SG=f}%-Officina\\
 	\verb-%{+SG=n}%-Forum
 \end{quote}
-If now a program sets \textit{noun} variable to one of those three templates, the results will be:
+If now a program sets the \textit{noun} variable to one of those three templates, the results will be:
 \begin{quote}
 	\texttt{Puteus magnus est} (for \textit{noun} set to the first template)\\
 	\texttt{Officina magna est} (for the second template)\\
@@ -134,12 +134,12 @@ the \textsc{G} function has a shorter form: \verb-%{noun!G:-\textit{a list}\verb
 	\verb+%{noun}%+ magn\verb+%{noun!G:us,a,um}%+ est
 \end{quote}
 Now the \textit{-us}, \textit{-a} and \textit{-um} endings are assigned to the \texttt{m=}, \texttt{f=} and \texttt{n=} parameters in order.
-The order of that parameters depends on the language. The \mulan{} has an embedded list of languages it supports. Each of entry in that list contains, among others, 
+The order of that parameters depends on the language. The \mulan{} has an embedded list of languages it supports. Each entry in that list contains, among others, 
 a specific order set to the Gender writer function, which dictates how a list is converted into a map. You can read what is that order in the \hyperref[supLangs]{Supported languages section}.
 
 \subsubsection{Case}
 
-Some languages employ a case system. A form of a noun depends of what a function it has in a sentence. If for example a noun is used as sentence's subject it has different form than
+Some languages employ a case system. A form of a noun depends of what a function it has in a sentence. If, for example, a noun is used as sentence's subject it has different form than
 when used as an object.
 
 For this feature \mulan{} has got two functions:\par 
@@ -154,7 +154,7 @@ Outputs the \textit{noun} variable, first informing it it should inflect by \tex
 
 If a template containing this function was informed by the Case chooser to inflect, this function outputs a \texttt{case$n$\_output} associated with \texttt{case$n$}.
 
-\paragraph{Example:} Again a Latin example. There is a template for word \emph{domus} (house):
+\paragraph{Example:} Again a Latin example. There is a template for a word \emph{domus} (house):
 \begin{quote}
 	dom\verb-%{+C nom={us} gen={us} dat={ui} acc={um} abl={o} voc={us} loc={i}}%-
 \end{quote}
@@ -185,7 +185,7 @@ There is only one function for this feature in \mulan{}.
 \verb-%{num!P:-\textit{list of outputs}\verb+}%+
  }\vspace{1em}
  
-The function gets a number from the variable and gives an output depending of the value and pluralization rules in the template's language.
+This function gets a number from the variable and gives an output depending of the value and pluralization rules in the template's language.
 
 The \hyperref[supLangs]{Supported languages section} contains the rules, list of classes of numbers and how short form of the function is mapped to the long form.
 
@@ -202,4 +202,3 @@ and with $num=3$ it will be:
 \begin{quote}
 	3 files deleted
 \end{quote}
-
