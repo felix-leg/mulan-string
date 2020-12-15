@@ -18,6 +18,8 @@ namespace mls::backend {
 		if( folderLookup == nullptr) bindtextdomain(packageName, "/usr/local/share/locale");
 		else bindtextdomain(packageName, folderLookup);
 		
+		bind_textdomain_codeset(packageName, "utf-8");
+		
 		textdomain(packageName);
 		
 		mls::initLocale(theLocale);
