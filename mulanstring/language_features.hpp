@@ -9,7 +9,7 @@
 namespace mls {
 	
 	struct Feature {
-			const char* langName;
+			const char* langName; //a ';'-separated string of possible language names
 			const char* decimalSeparator;
 			const char* thousandsSeparator;
 			///function returning name of a plural based on a number

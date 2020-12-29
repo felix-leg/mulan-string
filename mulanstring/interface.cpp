@@ -24,12 +24,20 @@ namespace mls {
 	
 	void initLocale(const char* locale) {
 		std::string strLoc = parseLocaleString(locale);
-		
-		if( auto found = FeaturesByLang.find(strLoc); found != FeaturesByLang.end() ) {
-			defaultLanguage = &(found->second);
-		} else {
-			defaultLanguage = &FeaturesByLang["en_US"];
+		for(auto& feature : FeaturesByLang) {
+			unsigned int nameNo = 0;
+			std::string nameStr;
+			while( (nameStr = getNthOnSClist(nameNo,feature.second.langName)) != "" ) {
+				if( nameStr == strLoc ) {
+					//locale found
+					defaultLanguage = &(feature.second);
+					return;
+				}
+				++nameNo;
+			}
 		}
+		//fallback
+		defaultLanguage = &FeaturesByLang["American English"];
 	}
 	
 	Template translate(const char* message) {
@@ -46,25 +54,47 @@ namespace mls {
 	}
 	Template translateWithLocale(const char* message, const char* locale) {
 		std::string strLoc = parseLocaleString(locale);
-		Feature* language;
+		Feature* language = nullptr;
 		
-		if( auto found = FeaturesByLang.find(strLoc.c_str()); found != FeaturesByLang.end() ) {
-			language = &(found->second);
-		} else {
-			language = &FeaturesByLang["en_US"];
+		for(auto& feature : FeaturesByLang) {
+			unsigned int nameNo = 0;
+			std::string nameStr;
+			while( (nameStr = getNthOnSClist(nameNo,feature.second.langName)) != "" ) {
+				if( nameStr == strLoc ) {
+					//locale found
+					language = &(feature.second);
+					break;
+				}
+				++nameNo;
+			}
+			if( language != nullptr ) break;
 		}
+		//fallback
+		if( language == nullptr )
+			language = &FeaturesByLang["American English"];
 		
 		return Template{ backend::getTranslation(message), language};
 	}
 	Template translateWithLocale(const char* catalogue, const char* message, const char* locale) {
 		std::string strLoc = parseLocaleString(locale);
-		Feature* language;
+		Feature* language = nullptr;
 		
-		if( auto found = FeaturesByLang.find(strLoc.c_str()); found != FeaturesByLang.end() ) {
-			language = &(found->second);
-		} else {
-			language = &FeaturesByLang["en_US"];
+		for(auto& feature : FeaturesByLang) {
+			unsigned int nameNo = 0;
+			std::string nameStr;
+			while( (nameStr = getNthOnSClist(nameNo,feature.second.langName)) != "" ) {
+				if( nameStr == strLoc ) {
+					//locale found
+					language = &(feature.second);
+					break;
+				}
+				++nameNo;
+			}
+			if( language != nullptr ) break;
 		}
+		//fallback
+		if( language == nullptr )
+			language = &FeaturesByLang["American English"];
 		
 		return Template{ backend::getTranslation(catalogue, message), language};
 	}
