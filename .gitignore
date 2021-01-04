@@ -46,3 +46,7 @@ manual/manual.log
 manual/manual.synctex.gz
 manual/manual.toc
 
+#backups files
+*~
+
+

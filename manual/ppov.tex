@@ -52,7 +52,20 @@ Again we first have to decide which backend to use:
 #define MULANSTR_USE_GETTEXT
 \end{verbatim}
 
-Then we can make a decision on what delimiters we use in template strings. 
+The next option is about invalid templates. \mulan{} allows to make empty Template objects using its default constructor with no arguments.
+These objects are considered "invalid" as they can't make properly translated strings. 
+However, having the Template class has got a default constructor means you can make a Template variable which can be assigned a valid Template later.
+It allows to use such variables as fields in your classes or dynamically assign templates based on some of your program's decisions. 
+
+The problem lies in how should such an invalid template behave when asked to do an action that requires it to be a valid one.
+By default an invalid template's \verb+apply(...)+ method does nothing and the \verb+get()+ method returns an empty string.
+If, for some reason, you want them return an exception instead, add the below line to your install file:
+\begin{verbatim}
+//to make invalid templates throw an mls::InvalidTemplateState exception
+#define MULANSTR_THROW_ON_INVALID_TEMPLATE
+\end{verbatim}
+
+Another decision you may want to make is what delimiters we use in template strings. 
 By default in \mulan{} templates are made using \verb+%{+ and \verb+}%+. For example in:
 \begin{quotation}
 	\textbf{\%\{}\texttt{parent}\textbf{\}\%} has \textbf{\%\{}\texttt{num}\textbf{\}\%} kids
