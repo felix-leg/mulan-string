@@ -20,6 +20,10 @@ namespace mls {
 	class WrongFunctionArguments : public std::exception {};
 	class RequiredVariableNotFound : public std::exception {};
 	
+#	ifdef MULANSTR_THROW_ON_INVALID_TEMPLATE
+	class InvalidTemplateState : public std::exception {};
+#	endif
+	
 	// -----------
 	
 	class Template; //forward declaration
@@ -119,6 +123,9 @@ namespace mls {
 			Template(const Template& other);
 			Template(Template&& other) = default;
 			Template& operator=(const Template& other);
+			
+			///default contructor making an invalid template object (to use when the valid object is obtained later)
+			Template();
 			
 			///assings variable value
 			Template& apply(std::string name, std::string value);

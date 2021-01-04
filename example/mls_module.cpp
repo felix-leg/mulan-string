@@ -7,6 +7,9 @@
 //We are using GNU GetText as our backend
 #define MULANSTR_USE_GETTEXT
 
+//We want all invalid templates to throw an exception on using apply() and get() methods
+#define MULANSTR_THROW_ON_INVALID_TEMPLATE
+
 /**
  * MuLan String uses '%{' and '}%' as delimiters inside its templates.
  * If one wants to change it, uncomment below 2 lines and set them

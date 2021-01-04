@@ -6,6 +6,7 @@
 #	include <boost/test/unit_test.hpp>
 
 #	include <iostream>
+#	define MULANSTR_THROW_ON_INVALID_TEMPLATE
 #endif
 
 /**
@@ -122,6 +123,10 @@ namespace mls {
 	}
 	
 	// ---------- Template class
+	
+	///default contructor making an invalid template object (to use when the valid object is obtained later)
+	Template::Template(): languageFeature(nullptr) {}
+	
 	Template::Template(std::string string_template, Feature* langFeature):
 	languageFeature(langFeature) {
 		auto parsedString = basicParseString(string_template);
@@ -357,18 +362,39 @@ namespace mls {
 	}
 	
 	Template& Template::apply(std::string name, Template value) {
+		if( languageFeature == nullptr ) {
+#	ifdef MULANSTR_THROW_ON_INVALID_TEMPLATE
+		throw InvalidTemplateState();
+#	else
+		return *this;
+#	endif
+		}
 		arguments.insert_or_assign(name,value);
 		
 		return *this;
 	}
 	
 	Template& Template::apply(std::string name, long value) {
+		if( languageFeature == nullptr ) {
+#	ifdef MULANSTR_THROW_ON_INVALID_TEMPLATE
+		throw InvalidTemplateState();
+#	else
+		return *this;
+#	endif
+		}
 		arguments.insert_or_assign(name, value);
 		
 		return *this;
 	}
 	
 	std::string Template::get() {
+		if( languageFeature == nullptr ) {
+#	ifdef MULANSTR_THROW_ON_INVALID_TEMPLATE
+		throw InvalidTemplateState();
+#	else
+		return "";
+#	endif
+		}
 		std::string output;
 		
 		for(const auto& element : elements) {
@@ -394,9 +420,9 @@ using namespace std;
 #include "basic_parse.cpp"
 #include "language_features.cpp"
 
-Feature* defaultLang = &FeaturesByLang["en_US"];
-Feature* langWithGenders = &FeaturesByLang["pl_PL"];
-Feature* langWithCases = &FeaturesByLang["pl_PL"];
+Feature* defaultLang = &FeaturesByLang["American English"];
+Feature* langWithGenders = &FeaturesByLang["Polski"];
+Feature* langWithCases = &FeaturesByLang["Polski"];
 
 BOOST_AUTO_TEST_CASE( testSimpleStringShouldGenerateTheSameString )
 {
@@ -487,6 +513,24 @@ BOOST_AUTO_TEST_CASE( testPluralFormsWithParamsAsTable )
 	
 	output = numFiles.apply("num",2).get();
 	BOOST_TEST_REQUIRE( output == string("2 files") );
+}
+
+BOOST_AUTO_TEST_CASE( testInvalidTemplate )
+{
+	Template invalid;
+	try{
+		string test = invalid.get();
+		BOOST_ERROR( "Invalid state doesn't throw an exception" );
+	} catch(InvalidTemplateState e) { /* OK */ };
+	
+	//validate the template
+	invalid = Template("test", defaultLang);
+	try{
+		string test = invalid.get(); //should not throw now
+		BOOST_TEST_REQUIRE( test == string("test") );
+	} catch(InvalidTemplateState e) { 
+		BOOST_ERROR( "A valid template throws an exception" );
+	};
 }
 
 #endif //end tests
