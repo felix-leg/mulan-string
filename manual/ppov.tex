@@ -10,10 +10,13 @@ Both parts are made with customization in mind. To use the library one have to "
 \end{description}
 
 \subsection{The \texttt{mulanstr.hpp} file}\label{headerFile}
-In this file we decide which of the supported backends we want to use\footnote{for now (version $1.0$) \mulan{} offers only GNU Gettext backend}:
+In this file we decide which of the supported backends we want to use:%\footnote{for now (version $1.0$) \mulan{} offers only GNU Gettext backend}:
 \begin{verbatim}
 //to use GNU Gettext backend
 #define MULANSTR_USE_GETTEXT
+
+//to use Dummy backend
+#define MULANSTR_USE_DUMMY
 \end{verbatim}
 
 The other option is to tell the library if we want to use 4 helper functions which all start with an underscore.
@@ -50,6 +53,9 @@ Again we first have to decide which backend to use:
 \begin{verbatim}
 //to use GNU Gettext backend
 #define MULANSTR_USE_GETTEXT
+
+//to use Dummy backend
+#define MULANSTR_USE_DUMMY
 \end{verbatim}
 
 The next option is about invalid templates. \mulan{} allows to make empty Template objects using its default constructor with no arguments.
@@ -144,6 +150,14 @@ std::cout << _("%{parent}% has got %{num}% %{num!P:kid,kids}%")
 \subsection{Working with backends}
 \mulan{}'s templates are taken from a backend. Different backends require different method to extract translatable strings from your project's code.
 Another fact is some backends require an initialization process before they can retrieve strings. How to do it is explained below.
+
+\subsubsection{Dummy}
+This backend does nothing more than returning the template string back without any effort to localize it. 
+It it meant as a test (or a backup) backend meant to make \mulan{} happy when there is no "real" backend available.
+
+However, even this "do-nothing" backend requires initialization by \verb+mls::backend::init()+ function. Don't forget to put a call to this function 
+somewhere at the begin of your application!
+
 \subsubsection{GNU Gettext}
 To initialize Gettext we need to call \verb+mls::backend::init(...)+ function. 
 This function requires a name of the main catalog used by our program. Usually it is the project name set by \verb+#define PACKAGE ...+ in the \texttt{config.h} header (if we use Autoconf).

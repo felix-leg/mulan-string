@@ -14,7 +14,7 @@ using namespace std;
 int main(int argc, char** argv) {
 	//initialize the backend. 
 	//as we use GNU GetText, we need to provide the right parameters
-	mls::backend::init("example", nullptr, "./locale");
+	mls::backend::init(("example", nullptr, "./locale");
 	
 	//now we can use translations
 	

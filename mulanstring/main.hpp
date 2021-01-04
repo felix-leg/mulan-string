@@ -15,6 +15,10 @@
 
 #include "backend/gettext.hpp"
 
+#elif defined(MULANSTR_USE_DUMMY)
+
+#include "backend/dummy.hpp"
+
 #else
 #	error No defined backend for MuLan String Library
 #endif

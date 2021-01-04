@@ -2,7 +2,7 @@
 An i18n and l10n library for C++. It aims at being easy to use for both programmer and translator, yet
 still powerful. 
 
-[The latest release: 1.1](https://github.com/felix-leg/mulan-string/releases/download/v1.1/mulan-string-1.1.tar.gz)
+[The latest release: 1.2](https://github.com/felix-leg/mulan-string/releases/download/v1.2/mulan-string-1.2.tar.gz)
 
 ## How MuLan-String works
 The idea of MLS is based on *template strings*. From the programmer's point of view the usage comes down to:
