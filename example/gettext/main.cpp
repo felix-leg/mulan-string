@@ -2,8 +2,10 @@
  * This is an example file demonstrating usage of MuLan String library
 */
 
-//include our MLS header file made specificaly for our project
-#include "mls_header.hpp"
+//include the right header (taken from the project's main folder)
+#define MULAN_STRING_IMPLEMENTATION
+#define MULANSTR_THROW_ON_INVALID_TEMPLATE
+#include <mulanstring-gettext.hpp>
 
 //the rest of our program
 #include <iostream>
@@ -14,7 +16,7 @@ using namespace std;
 int main(int argc, char** argv) {
 	//initialize the backend. 
 	//as we use GNU GetText, we need to provide the right parameters
-	mls::backend::init(("example", nullptr, "./locale");
+	mls::backend::init("example", nullptr, "./locale");
 	
 	//now we can use translations
 	

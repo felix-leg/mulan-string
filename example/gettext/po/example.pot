@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the example package.
+# This file is distributed under the same license as the gettext_test package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: example 1.0\n"
+"Project-Id-Version: gettext_test 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-08 14:38+0200\n"
+"POT-Creation-Date: 2022-03-18 15:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. now we can use translations
-#: main.cpp:21
+#: /home/przemo/Programowanie/Projekty na GitHub/mulan-string/example/gettext/main.cpp:22
 msgid "Simple text"
 msgstr ""
 
-#: main.cpp:24
+#: /home/przemo/Programowanie/Projekty na GitHub/mulan-string/example/gettext/main.cpp:25
 msgid "%{var}% text"
 msgstr ""
 
-#: main.cpp:27
+#: /home/przemo/Programowanie/Projekty na GitHub/mulan-string/example/gettext/main.cpp:28
 msgid "%{num}% file%{num!P:,s}% modifed"
 msgstr ""

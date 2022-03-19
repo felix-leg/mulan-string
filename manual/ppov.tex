@@ -1,87 +1,55 @@
 \section{The programmer's POV}
 
 \mulan{} was made to be easy to use in source code in different projects. Its main parts are the template system and the backend. 
-Both parts are made with customization in mind. To use the library one have to "install" it in a project. This is done by making 2 files:
+Both parts are made with customization in mind. To use the library one have to "install" it in a project. 
+To install the library you have to choose one of the files included with this manual:
 \begin{description}
-	\item[A *.hpp file] is meant to be included into every module which needs to be internationalized. 
-	It contains some \verb+#define+-s and \verb+#include<mulanstring/main.hpp>+.
-	\item[A *.cpp file] build once for the project. It also contains \verb+#define+-s and at the end \verb+#include+-s the \verb+mulanstring/main.cpp+ file. 
-	The purpose of this file is to add the implementation part of the \mulan{} library into the project.
+  \item[\texttt{mulanstring.hpp} file] contains only the core of the \mulan{} library. You can use this file, if you want to use your own backend.
+  \item[\texttt{mulanstring-gettext.hpp} file] contains also the GNU Gettext backend bundled with the \mulan{}. If your project's internationalization system 
+  is based on GNU Gettext library, you should choose this file
 \end{description}
 
-\subsection{The \texttt{mulanstr.hpp} file}\label{headerFile}
-In this file we decide which of the supported backends we want to use:%\footnote{for now (version $1.0$) \mulan{} offers only GNU Gettext backend}:
+The installation itself is made around the idea of one file being both a header and an implementation\footnote{You may know it under the name "STB library"}.
+For every source file in your project that requires \mulan{} you have just put a normal \verb+#include+ directive pointing to the file you have chosen from the above list.
 \begin{verbatim}
-//to use GNU Gettext backend
-#define MULANSTR_USE_GETTEXT
-
-//to use Dummy backend
-#define MULANSTR_USE_DUMMY
+#include "mulanstring.hpp"
 \end{verbatim}
-
-The other option is to tell the library if we want to use 4 helper functions which all start with an underscore.
-These are meant to speed up writing programs. They are short name replacements for functions retrieving template strings from the backend.
-If one doesn't want them he has to write:
+Then you have to choose \emph{one file} in your project that will contain the implementation like so:
 \begin{verbatim}
-#define MULANSTR_DONT_USE_UNDERSCORE
+#define MULAN_STRING_IMPLEMENTATION
+#include "mulanstring.hpp"
 \end{verbatim}
+If you want to use \mulan{} with default options that's all you need. You are ready!
 
-These functions (and their replacements) are:
-\begin{enumerate}
-	\item \texttt{\_(message)} or \texttt{mls::translate(message)}: the basic template retriever. Gets template in the default language set during initialization.
-	\item \texttt{\_c(catalog, message)} or \texttt{mls::translate(catalog, message)}: Gets template from a different catalog. 
-	The term `catalog' can mean different things for different backends. In the GNU Gettext it is the name of a `\texttt{.mo}` file.
-	\item \texttt{\_l(message, locale)} or \texttt{mls::translateWithLocale(message, locale)}: Gets template in the language given as the second parameter. 
-	\item \texttt{\_cl(catalog, message, locale)} or\\ \texttt{mls::translateWithLocale(}\texttt{catalog, message, locale)}: like 2. but allows to choose a different language.
-\end{enumerate}
+\subsection{Common options}
+The previous section has shown the basic installation. Sometimes, however, you may want to change some tune up the library more to your needs.
+\mulan{} offers you the bellow adjustments:
+\begin{itemize}
+  \item How to treat invalid templates,
+  \item What are the template markers,
+  \item (For GNU Gettext) if the library should include underscored functions
+\end{itemize}
 
-And at the end of our header file we include the \mulan{} main header file:
+\paragraph{Invalid templates:} The first decision you may want is to choose how \mulan{} should react on improperly formatted template strings.
+By default a wrong template object produces an empty string, no matter how it's called. If, for some reason, you want the \mulan{} to throw an error
+you have to put a \verb+#define+ directive in the file that's including the library's implementation:
 \begin{verbatim}
-#include <mulanstring/main.hpp>
-\end{verbatim}
-
-Now, in every source file in our project that needs to use \mulan{}'s elements, we include our file:
-\begin{verbatim}
-#include "mulanstr.hpp"
-\end{verbatim}
-
-\subsection{The \texttt{mulanstr.cpp} file}
-This file properly installs \mulan{} into our project. 
-Just like in the previous subsection, it does by \verb+#define+-ing macros, which affect the library's \verb+main.cpp+ file.
-
-Again we first have to decide which backend to use:
-\begin{verbatim}
-//to use GNU Gettext backend
-#define MULANSTR_USE_GETTEXT
-
-//to use Dummy backend
-#define MULANSTR_USE_DUMMY
-\end{verbatim}
-
-The next option is about invalid templates. \mulan{} allows to make empty Template objects using its default constructor with no arguments.
-These objects are considered "invalid" as they can't make properly translated strings. 
-However, having the Template class has got a default constructor means you can make a Template variable which can be assigned a valid Template later.
-It allows to use such variables as fields in your classes or dynamically assign templates based on some of your program's decisions. 
-
-The problem lies in how should such an invalid template behave when asked to do an action that requires it to be a valid one.
-By default an invalid template's \verb+apply(...)+ method does nothing and the \verb+get()+ method returns an empty string.
-If, for some reason, you want them return an exception instead, add the below line to your install file:
-\begin{verbatim}
-//to make invalid templates throw an mls::InvalidTemplateState exception
 #define MULANSTR_THROW_ON_INVALID_TEMPLATE
+#define MULAN_STRING_IMPLEMENTATION
+#include "mulanstring.hpp"
 \end{verbatim}
 
-Another decision you may want to make is what delimiters we use in template strings. 
-By default in \mulan{} templates are made using \verb+%{+ and \verb+}%+. For example in:
+\paragraph{Template markers:}Another decision you may want to make is what delimiters are used in template strings. 
+By default in \mulan{} templates are made using \verb+%{+ and \verb+}%+ markers. For example in:
 \begin{quotation}
 	\textbf{\%\{}\texttt{parent}\textbf{\}\%} has \textbf{\%\{}\texttt{num}\textbf{\}\%} kids
 \end{quotation}
 template the \verb+%{parent}%+ and \verb+%{num}%+ are substitution commands. 
-If for some reason we want to use \verb+[[+ and \verb+]]+ as delimiters, we have to write:
+If for some reason you want to use \verb+[[+ and \verb+]]+ as delimiters, you have to write:
 \begin{verbatim}
 #define MULANSTR_TAG_START "[["
 #define MULANSTR_TAG_END "]]"
-\end{verbatim} in our \texttt{mulanstr.cpp} file.
+\end{verbatim} in the implementation file (before the \verb+#include+ directive).
 
 Some template tags needs parameters. For example in:
 \begin{quotation}
@@ -92,26 +60,85 @@ It then produces output based on whenever \texttt{num} is $1$ or $>$1 (for Engli
 So, the above example will result in "There is 1 file" or "There is 8 files" (for \texttt{num} being $1$ and $8$ respectively).
 For this it needs to know what text to output. And these texts are given between \textbf{\{} and \textbf{\}} delimiters.
 
-If one wants to change those internal delimiters to \verb+<+ and \verb+>+, he has to write:
+If you want to change those internal delimiters to \verb+<+ and \verb+>+, you have to add:
 \begin{verbatim}
 #define MULANSTR_INNER_TAG_START "<"
 #define MULANSTR_INNER_TAG_END ">"
+\end{verbatim} to the above list.
+
+\paragraph{Helper functions:}\label{helpFunc} The other option is to tell the library if we want to use 2 helper functions which all start with an underscore.
+These are meant to speed up writing programs. They are short name replacements for functions retrieving template strings from the backend.
+If you don't want them just write:
+\begin{verbatim}
+#define MULANSTR_DONT_USE_UNDERSCORE
+\end{verbatim} in the known location.
+
+These functions (and their replacements) are:
+\begin{enumerate}
+	\item \texttt{\_(message)} or \texttt{mls::translate(message)}: the basic template retriever. Gets template in the default language set during initialization.
+	\item \texttt{\_c(catalog, message)} or \texttt{mls::translate(catalog, message)}: Gets template from a different catalog. 
+	In the GNU Gettext `catalog' is the name of a `\texttt{.mo}` file.
+\end{enumerate}
+
+
+\subsection{Working with backends}
+\mulan{}'s templates are taken from a backend. Different backends require different method to extract translatable strings from your project's code.
+Another fact is some backends require an initialization process before they can retrieve strings. How to do it is explained below.
+
+\subsubsection{GNU Gettext}
+To initialize Gettext you need to call \verb+mls::backend::init(...)+ function. 
+This function requires a name of the main catalog used by our program. Usually it is the project name set by \verb+#define PACKAGE ...+ in the \texttt{config.h} header (if you are using Autoconf).
+Other parameters are: the locale name and localization of \texttt{.mo} files. These are optional and, if not provided, are set to their default values (which for the locale is the system locale 
+and for the localization is \texttt{/usr/local/share/locale}). The initialization should be done as earlier as possible, preferably in the \verb+main()+ function:
+\begin{verbatim}
+int main() {
+// ...
+mls::backend::init(PACKAGE);
+//or if you want to set locale:
+mls::backend::init(PACKAGE, "en_US");
+//or if you want to set localization:
+mls::backend::init(PACKAGE, nullptr, "./locales");
+//or all three:
+mls::backend::init(PACKAGE, "en_US", "./locales");
+// ...
+}
 \end{verbatim}
 
-And finally our \texttt{mulanstr.cpp} file has to end with:
-\begin{verbatim}
-#include <mulanstring/main.cpp>
-\end{verbatim}
+To extract template strings you have to run \texttt{xgettext} with these parameters: 
+\begin{quote}
+	\texttt{xgettext} \verb+-C+ \verb+-k_+ \verb+-k_c:2+ \texttt{-o} $<$\textbf{name of the output .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
+\end{quote}
+or, if you have set \verb+MULANSTR_DONT_USE_UNDERSCORE+ you need to write a longer list:
+\begin{quote}
+	\texttt{xgettext} \verb+-C+ \verb+-kmls::translate+ \verb+-kmls::translate:2+ $\backslash$ \\ \texttt{-o} $<$\textbf{name of the output .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
+\end{quote}
+
+For information on how to work with \texttt{.pot}, \texttt{.po} and \texttt{.mo} files refer to the GNU Gettext manual\footnote{Available at \url{https://www.gnu.org/software/gettext/manual/index.html}}.
+
 \subsection{Using MLS templates in code}
-OK, once we have set those two files properly, we can use \mulan{}'s capabilities. 
-To do it we have to find in our project's source code every use of strings which needs to be translated. 
-Then we have to replace these strings with \mulan{}'s call to templates. It consist of three parts:
-\subsubsection{Getting the template}
-First we need a template. We get it by using special template retrieval functions discussed in the \ref{headerFile} subsection. 
-We can do it as in the example:
+The idea of \mulan{} is based around template strings. You use the library by making objects of the \verb+mls::Template+ class.
+How to do it depends on if you preferred to use some backend or not:
+
+\subsubsection{No backend}
+This solution gives you the greatest freedom over how templates are constructed. It also may be the least comfortable, as you have to
+provide also a \emph{locale} for every template object. To do so, call the \verb+mls::locale::getLocale(...)+ function:
+\begin{verbatim}
+auto myLocale = mls::locale::getLocale("en_US");
+\end{verbatim}
+(the locale names are listed in the \hyperref[supLangs]{Supported languages} section.)
+
+To obtain a template object you have to make a \verb+mls::Template+ variable with \emph{template string} and \emph{locale} object passed to its constructor:
+\begin{verbatim}
+mls::Template aTemplate{"Template string", myLocale};
+\end{verbatim}
+
+\subsubsection{GNU Gettext backend}
+Having GNU Gettext as our backend, you can get it by using special template retrieval functions discussed in the \ref{helpFunc} subsection. 
+You can do it as in the example:
 \begin{verbatim}
 auto filesFound = _("%{num}% file%{num!P:,s}% have been found");
 \end{verbatim}
+This will give you template object with locale set during the initialization.
 
 \subsubsection{Applying variables}
 Some templates require additional information to produce a result string.
@@ -147,46 +174,20 @@ std::cout << _("%{parent}% has got %{num}% %{num!P:kid,kids}%")
 			.get() << std::endl; //produces "Bob has got 2 kids"
 \end{verbatim}
 
-\subsection{Working with backends}
-\mulan{}'s templates are taken from a backend. Different backends require different method to extract translatable strings from your project's code.
-Another fact is some backends require an initialization process before they can retrieve strings. How to do it is explained below.
-
-\subsubsection{Dummy}
-This backend does nothing more than returning the template string back without any effort to localize it. 
-It it meant as a test (or a backup) backend meant to make \mulan{} happy when there is no "real" backend available.
-
-However, even this "do-nothing" backend requires initialization by \verb+mls::backend::init()+ function. Don't forget to put a call to this function 
-somewhere at the begin of your application!
-
-\subsubsection{GNU Gettext}
-To initialize Gettext we need to call \verb+mls::backend::init(...)+ function. 
-This function requires a name of the main catalog used by our program. Usually it is the project name set by \verb+#define PACKAGE ...+ in the \texttt{config.h} header (if we use Autoconf).
-Other parameters are: the locale name and localization of \texttt{.mo} files. These are optional and, if not provided, are set to their default values (which for the locale is the system locale 
-and for the localization is \texttt{/usr/local/share/locale}). The initialization should be done as earlier as possible, preferably in the \verb+main()+ function:
-\begin{verbatim}
-int main() {
-// ...
-mls::backend::init(PACKAGE);
-//or if we want to set locale:
-mls::backend::init(PACKAGE, "en_US");
-//or if we want to set localization:
-mls::backend::init(PACKAGE, nullptr, "./locales");
-//or all three:
-mls::backend::init(PACKAGE, "en_US", "./locales");
-// ...
-}
-\end{verbatim}
-
-To extract template strings we need to run \texttt{xgettext} with these parameters: 
-\begin{quote}
-	\texttt{xgettext} \verb+-C+ \verb+-k_+ \verb+-k_c:2+ \verb+-k_l:1+ \verb+-k_cl:2+ \texttt{-o} $<$\textbf{name of .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
-\end{quote}
-or, if we have set \verb+MULANSTR_DONT_USE_UNDERSCORE+ we need to write a longer list:
-\begin{quote}
-	\texttt{xgettext} \verb+-C+ \verb+-kmls::translate+ \verb+-kmls::translate:2+ $\backslash$ \\ \verb+-kmls::translateWithLocale:1+ \verb+-kmls::translateWithLocale:2+ $\backslash$ \\ \texttt{-o} $<$\textbf{name of .pot file}$>$ $<$\textit{list of .hpp and .cpp files}$>$
-\end{quote}
-
-For information on how to work with \texttt{.pot}, \texttt{.po} and \texttt{.mo} files refer to the GNU Gettext manual\footnote{Available at \url{https://www.gnu.org/software/gettext/manual/index.html}}.
+\subsection{The \texttt{apply} family}
+What can you put in the \verb+apply(...)+ method? A couple of things:
+\begin{description}
+  \item[Numbers] You can set a template's variable to a number by using the \verb+apply(varName, number)+ method for integers up to the \verb+long+ size,
+  or \verb+applyReal(varName, real)+ for real numbers up to the \verb+double+~size. Numbers can be used for their raw value or as an input to some functions.
+  \item[Strings] Raw strings are printed as-is, without any formatting done to them. They should be used for anything that must not be or can not be modified 
+  by a translator. Use them sparingly as this blocks your translator from applying any of \mulan{} powerful functions!
+  \item[Other templates] When you want to insert some text into another text, then this is the right way of doing it. 
+  It let's your translator to use the full potential of the \mulan{} template system. As a rule of thumb you should choose this method, if you want
+  to put single words inside a sentence. These words should be made in their own template objects and retrieved from your backend. 
+  
+  If, for some reason, you can't do that (because, for example, these words are generated on-the-fly or come from some external source), you should fallback to raw strings.
+  It would be then a good thing if you let your future translators get to know if this is the case (for example by using \mulan{} comments, see the next section).
+\end{description}
 
 \subsection{A quick overview of the template string syntax}
 So far now I told you how to get and work with templates, but nothing about \emph{what to put in them}. 
@@ -200,19 +201,26 @@ The templates are strings with tags which may be identified by \verb+%{+ and \ve
 Everything inside them tells the \mulan{} to do its "magic". 
 
 There are two main types of tags: a substitution tag and a function tag:
-\paragraph{The substitutions} are tags in the form \verb+%{+\textit{variable\_name}\verb+}%+. They work by putting a text (or a number) from a variable named the same as it is written between the delimiters.
-The content of that variable are given by the \verb+apply(...)+ method of a template. 
+\paragraph{Substitutions} are tags in the form \verb+%{+\textit{variable\_name}\verb+}%+. They work by putting a text (or a number) from a variable named the same as it is written between the delimiters.
+The content of that variable are given by the \verb+apply(...)+ method(s) of a template. 
 
-\paragraph{The functions} are tags in the form \verb+%{+\textit{variable\_name}\verb+!FUNCTION+ \textit{arguments...}\verb+}%+.
+\paragraph{Functions} are tags in the form \verb+%{+\textit{variable\_name}\verb+!FUNCTION+ \textit{arguments...}\verb+}%+.
 They work in the similar way to the above, but use one of \mulan{} functions to process the content of the \textit{variable\_name} in some way and produce the output based on its result.
-For the English users the only function you must know about is the \texttt{P} function, which stands for \textit{(P)luralize}.
+For the English users the only functions you must know about are:
+\begin{itemize}
+ \item the \texttt{P} function, which stands for \textit{(P)luralize},
+ \item the \texttt{I} function that prints and formats an \textit{(I)nteger},
+ \item the \texttt{R} function that prints and formats a \textit{(R)eal number}.
+\end{itemize}
+
+\subsubsection{Pluralizer}
 The function gets two parameters and a variable name. The parameters tells the function what to output if the variable is equal to $1$ or not.
 
 The arguments may be given in two possible ways:
 \begin{itemize}
 	\item \textbf{As a table}: \verb+%{+\textit{variable\_name}\verb+!P:+\textit{singular form}\verb+,+\textit{plural form}\verb+}%+
 	\item \textbf{As a hash}: \verb+%{+\textit{variable\_name}\verb+!P one={+\textit{singular form}\verb+} other={+\textit{plural form}\verb+}}%+\footnote{Remember you can change internal \{
-	and \} characters to anything else}
+	and \} characters to anything else in your setup}
 \end{itemize}
 
 \paragraph{Example:}
@@ -227,7 +235,7 @@ and put the "\texttt{has}" string in its place.
 As a result the output will be: \texttt{"1 page has been printed."}.
 
 Now, let's suppose the \textit{num} is equal to $4$. 
-The first tag will produce "\texttt{4}", the second: "\texttt{pages}" and the third: "\texttt{have}" which results in a output:
+The first tag will produce "\texttt{4}", the second: "\texttt{pages}" and the third: "\texttt{have}" which results in an output:
 \texttt{"4 pages have been printed."}.
 
 \vspace{2em}
@@ -238,7 +246,75 @@ Take note that the above example may be written also in this way:
 \end{quote}
 The produced result will be the same. It's up to you which form you think is more readable and maintainable. 
 
-\paragraph{Comments} The last thing to know about \mulan{} templates is you can put comments inside them.
+\subsubsection{Integer formatter}
+The next function in your (English) toolset is \texttt{I}. 
+It is a simple function that prints an integer (and only an integer). What makes it different from simple \verb+%{var}%+ substitution? 
+Well, it allows you (and your translator) to let your number string follow the formatting rules of an language. 
+In English language it boils down to add ``,'' characters in numbers bigger than a thousand. 
+
+You use this function by giving it an argument in this way:
+\begin{itemize}
+  \item \verb+%{+\textit{variable\_name}\verb+!I=general}%+ or
+  \item \verb+%{+\textit{variable\_name}\verb+!I=grouped}%+
+\end{itemize}
+The first version prints number more of less as-is without grouping. The second one adds grouping characters when necessary. 
+
+\paragraph{Example:}
+\begin{quote}
+  Your big number is \verb+%{num!I=general}%+ or \verb+%{num!I=grouped}%+ (pretty printed).
+\end{quote}
+Now if you set the \textit{num} variable to a million it will produce the string:
+\begin{quote}
+  Your big number is 1000000 or 1,000,000 (pretty printed).
+\end{quote}
+
+What to use depends on your business requirements.
+
+\begin{tabular}{|p{.9\textwidth}|}
+\hline %\\
+  \textbf{Side note: Are there any other formats besides "general" and "grouped"?} \\
+  You may wonder why the \texttt{I} function requires an argument. 
+  Why to bother if one can simply print numbers with \verb+%{num}%+ and occasionally use \verb+%{num!I}%+ for cases
+  when it requires the number to be pretty formatted? 
+  Well, one case that you might consider is printing \emph{money} amounts. 
+  This is one moment when you might think it would be enough to just print a number with thousand's separators like anywhere else
+  (adjusted to the specific language's separator character). \\
+  Unfortunately this way of thinking will let your \emph{Swiss} users get angry at you. 
+  In this country there are different formatting rules for printing \emph{regular} numbers and the mentioned \emph{money amounts} numbers. 
+  Normal numbers are formatted in this way: \\ 
+  \texttt{1~234~567,89}\\ 
+  And money are printed like that: \\ 
+  \texttt{1'234'567.89} \\
+  so forcing users of your application to chose only between two number formats may be not as well thought idea as you may think.
+  \\
+\hline
+\end{tabular}
+
+\subsubsection{Real numbers formatter}
+The \texttt{R} function is used in a similar way as the \texttt{I} function. 
+It let's you print numbers with fractional parts in a way that is compliant with the rules of the destination language (like for example using the right fraction separator character).
+
+You can use this function in one of the below ways:
+\begin{itemize}
+  \item \verb+%{num!R:+\textit{number format}\verb+}%+
+  \item \verb+%{num!R:+\textit{number format},\textit{precision}\verb+}%+
+  \item \verb+%{num!R format={+\textit{number format}\verb+}}%+
+  \item \verb+%{num!R prec={+\textit{precision}\verb+}}%+
+  \item \verb+%{num!R format={+\textit{number format}\verb+} prec={+\textit{precision}\verb+}}%+
+\end{itemize}
+As you can see you may pass the arguments in both \emph{short} and \emph{verbose} format and specify the required \emph{precision} as well.
+If you don't write precision, the \mulan{} assumes you want to print a number with as many fractional digits as it is necessary.
+
+\paragraph{Example:}
+\begin{quote}
+  The Earth's radius is equal to \verb+%{radius!R:grouped,3}%+ km.
+\end{quote}
+This will result in a string:
+\begin{quote}
+  The Earth's radius is equal to $6~356.752$ km.
+\end{quote}
+
+\subsubsection{Comments} The last thing to know about \mulan{} templates is you can put comments inside them.
 They are made in this way:
 \begin{quote}
 	Text \verb+%{#+\textit{comment}\verb+#}%+ around.
@@ -249,8 +325,11 @@ Text  around.
 \end{verbatim*}(mind the double spaces between words!)
 
 What comments are useful for? Well, sometimes to translate the sentence translators need some external information. 
-However the process of extracting templates from a source code removes that information. Let's suppose we want translators to translate "Sam is beautiful."
+However the process of extracting templates from a source code may remove that information. Let's suppose we want translators to translate "Sam is beautiful."
 In some languages the word "beautiful" will be different, depending on whenever Sam is a man or a woman. But all that a translator sees is just that simple text.
 It would be good, if we had some way to inform our translators about the Sam's gender, thus solving the ambiguity. 
 
-And that's is why comments may be useful. You can write the above example as: "Sam\verb+%{#a woman#}%+ is beautiful."
+And that's is why comments may be useful. You can write the above example as: 
+\begin{quote}
+  Sam\verb+%{#a woman#}%+ is beautiful.
+\end{quote}

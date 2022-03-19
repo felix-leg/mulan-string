@@ -91,7 +91,7 @@ The solution again lies in the possibility for programmer to add comments. For e
 \subsection{List of functions}\label{funcs}
 
 OK, so after we have learned how to write function tags, now I can tell you what possibilities \mulan{} gives to you.
-I divided the list into 3 parts by the topic. Each topic tells about problems you may encounter during a translation.
+I divided the list into 4 parts by the topic. Each topic tells about problems you may encounter during a translation.
 
 \def\funSep{\vspace{1em} \hrule \vspace{1em}}
 
@@ -189,7 +189,7 @@ This function gets a number from the variable and gives an output depending of t
 
 The \hyperref[supLangs]{Supported languages section} contains the rules, list of classes of numbers and how short form of the function is mapped to the long form.
 
-\paragraph{Example:} In the English language nouns has got singular and plural forms. Singular forms are applied to quantities equal $1$ and plural forms for the rest.
+\paragraph{Example:} In the English language nouns has got singular and plural forms. Singular forms are applied to quantities equal to $1$ and plural forms for the rest.
 Therefore one can write a template like:
 \begin{quote}
 	\verb+%{num}%+ file\verb+%{num!P one={} other={s}}%+ deleted
@@ -202,3 +202,57 @@ and with $num=3$ it will be:
 \begin{quote}
 	3 files deleted
 \end{quote}
+
+\subsubsection{Number formats}
+Functions in this section operates on numbers. They are meant to print numbers with the right thounsands separator and fractional separator.
+Also these functions take care of separating numbers in groups with the right amount of digits in each group.
+
+There are two functions in this group:
+
+\funSep {\large (I)nteger formater $\Rightarrow$ \verb+%{num!I=+\textit{number format name}\verb+}%+}\vspace{1em}
+
+It prints an integer (a number without any fractional parts). It takes one required parameter: \emph{number format name}. 
+To know what are the names, refer to the \hyperref[supLangs]{Supported languages section}. However, mostly you can put there one of those values:
+\begin{description}
+  \item[general] It (usualy) prints a number without any separators. 
+  \item[grouped] Prints a number grouped and separated.
+\end{description}
+
+What to use depends on what you think should be acceptable in your language in a specific template case.
+You are free to change the programmer's decision. 
+
+\funSep {\large (R)eal number formater $\Rightarrow$ \verb+%{num!R:+\textit{a list}\verb+}%+ \textbf{or} \verb+%{num!R +\textit{a map}\verb+}%+ }\vspace{1em}
+
+This one is slightly more complicated function. It prints a real number (a number with some fractional parts).
+It takes as parameters a number format name (used like in the previous function) and optionaly a precision.
+
+It is used in one of these ways:
+\begin{itemize}
+  \item \verb+%{num!R:+\textit{number format}\verb+}%+
+  \item \verb+%{num!R:+\textit{number format},\textit{precision}\verb+}%+
+  \item \verb+%{num!R format={+\textit{number format}\verb+}}%+
+  \item \verb+%{num!R prec={+\textit{precision}\verb+}}%+
+  \item \verb+%{num!R format={+\textit{number format}\verb+} prec={+\textit{precision}\verb+}}%+
+\end{itemize}
+
+\paragraph{Example:}
+Let's consider the template:
+\begin{quote}
+  You owe to the bank \$\verb+%{amount!R format{grouped} prec={2}}%+.
+\end{quote}
+When printed in English it may result in:
+\begin{quote}
+  You owe to the bank \$1,234.56.
+\end{quote}
+
+However, if you translate the above template to some of a Swiss bank application, you may write it like so:
+\begin{quote}
+  Sie schulden der Bank \verb+%{amount!R format={money} prec={2}}%+ CHF.
+\end{quote}
+which may result in this string (after doing the right variable substitution):
+\begin{quote}
+  Sie schulden der Bank 1'234.56 CHF.
+\end{quote}
+
+Take note of one thing: the programmer have chosen a \emph{grouped} number format, because that's the right format used when printing an amount of money in English.
+However you, a supposedly Swiss translator, have changed that choice to special \emph{money} number format, that formats the value as it should be formatted in the Swiss language with regard to money.
